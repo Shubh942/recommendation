@@ -13,23 +13,18 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 movies_data = pd.read_pickle('data.pkl') 
 similarity = pkl.load(open('similarity1.pkl','rb'))
 
-import json
-for i in range(len(movies_data['keywords'])):
-  movies_data['keywords'][i]=json.loads(movies_data['keywords'][i])
-  movies_data['keywords'][i] = [d['name'] for d in movies_data['keywords'][i]]
-
 @app.route('/predict', methods=['POST'])
 def predict():
     keyword = request.get_json()['keyword']
     list_of_all_keywords = movies_data['keywords'].tolist()
-    find_close_match=[]
-    for idx, keywords in enumerate(list_of_all_keywords):
-        close_matches = difflib.get_close_matches(keyword, list_of_all_keywords)
-        if close_matches:
-            for match in close_matches:
-                find_close_match.append(keywords)
-    close_match = find_close_match[0]
-    index_of_the_movie=0
+    close_matches=[]
+    for keywords in list_of_all_keywords:
+      for key in keywords:
+        if(key==keyword):
+          close_matches.append(keywords)
+          break
+    close_match = close_matches[0]
+    index_of_the_movie=-1
     for i in range(len(movies_data['keywords'])):
       if(movies_data['keywords'][i] == close_match):
         index_of_the_movie=i
@@ -37,18 +32,13 @@ def predict():
     similarity_score = list(enumerate(similarity[index_of_the_movie]))
 
     sorted_similar_movies = sorted(similarity_score, key=lambda x: x[1], reverse=True)
-
-    print('Movies suggested for you: \n')
-
-    i = 1
     recommended_movies = []
     for movie in sorted_similar_movies:
         index = movie[0]
         title_from_index = movies_data[movies_data.index == index]['title'].values[0]
-        if i < 30:
-            recommended_movies.append(title_from_index)
+        recommended_movies.append(title_from_index)
     
-    return jsonify({'movies': recommended_movies})
+    return jsonify({'movies': recommended_movies[:100]})
 
 if __name__ == "__main__":
     app.run()
