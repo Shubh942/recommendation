@@ -17,7 +17,6 @@ similarity = pkl.load(open('similarity.pkl','rb'))
 def predict():
     movie = request.get_json()['movie']
     movie_index = -1
-    print(new_df[new_df['title'] == movie])
     if(new_df[new_df['title'] == movie].isnull().values.any() == True):
         movie_index = new_df[new_df['title'] == movie].index[0]
     else:
