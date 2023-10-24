@@ -2,6 +2,7 @@ import pickle as pkl
 import json
 import pandas as pd
 import difflib
+import random
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 from sklearn.metrics.pairwise import cosine_similarity
@@ -23,11 +24,17 @@ def predict():
         if(key==keyword):
           close_matches.append(keywords)
           break
-    close_match = close_matches[0]
+    close_match = ""
+    print(len(close_matches))
+    if(len(close_matches)>0):
+        close_match = close_matches[0]
     index_of_the_movie=-1
     for i in range(len(movies_data['keywords'])):
       if(movies_data['keywords'][i] == close_match):
         index_of_the_movie=i
+      else:
+         index_of_the_movie=random.randint(1, 1000)
+      
 
     similarity_score = list(enumerate(similarity[index_of_the_movie]))
 
