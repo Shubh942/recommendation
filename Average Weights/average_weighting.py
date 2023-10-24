@@ -1,6 +1,7 @@
 import pickle as pkl
 import json
 import pandas as pd
+import random
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 from sklearn.metrics.pairwise import cosine_similarity
@@ -22,7 +23,12 @@ indices=pkl.load(open('indices.pkl','rb'))
 @app.route('/predict', methods=['POST'])
 def predict():
     title = request.get_json()['movie']
-    idx = indices[title]
+    for i in range(len(movies_cleaned_df)):
+        if(movies_cleaned_df['original_title'][i] == title):
+            idx = indices[title]
+            break
+        else:
+            idx=random.randint(1, 1000)
 
     # Get the pairwsie similarity scores 
     sig_scores = list(enumerate(sig[idx]))

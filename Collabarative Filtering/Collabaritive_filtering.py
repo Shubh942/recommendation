@@ -17,7 +17,7 @@ similarity = pkl.load(open('similarity.pkl','rb'))
 def predict():
     movie = request.get_json()['movie']
     movie_index = -1
-    if(new_df[new_df['title'] == movie].isnull().values.any() == True):
+    if(new_df[new_df['title'] == movie].isnull().values.any() == False):
         movie_index = new_df[new_df['title'] == movie].index[0]
     else:
         movie_index=random.randint(1, 1000)
@@ -28,4 +28,4 @@ def predict():
     return jsonify({'movies': recommended_movies})
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host='0.0.0.0', port=8081)
